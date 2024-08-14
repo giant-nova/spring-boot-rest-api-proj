@@ -1,5 +1,8 @@
-package com.project.spring_rest_api.user;
+package com.project.spring_rest_api.jpa;
 
+import com.project.spring_rest_api.user.User;
+import com.project.spring_rest_api.user.UserDaoService;
+import com.project.spring_rest_api.user.UserNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -14,20 +17,22 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-public class UserResource {
+public class UserJpaResource {
 
     private UserDaoService service;
 
-    public UserResource(UserDaoService service) {
+    private UserRepository repository;
+    public UserJpaResource(UserDaoService service, UserRepository repository) {
+        this.repository = repository;
         this.service = service;
     }
 
-    @GetMapping("/users")
+    @GetMapping("/jpa/users")
     public List<User> retrieveAllUsers(){
-        return service.findAll();
+        return repository.findAll();
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/jpa/users/{id}")
     public EntityModel<User> retrieveUserById(@PathVariable Integer id){
 
         User user = service.findById(id);
@@ -40,7 +45,7 @@ public class UserResource {
         return entityModel;
     }
 
-    @PostMapping("/users")
+    @PostMapping("/jpa/users")
     public ResponseEntity<User> createUser(@Valid @RequestBody User user){
         User savedUser = service.save(user);
 
@@ -52,7 +57,7 @@ public class UserResource {
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/jpa/users/{id}")
     public void deleteUser(@PathVariable int id){
         service.deleteById(id);
     }
